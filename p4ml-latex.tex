@@ -1,0 +1,69 @@
+\documentclass[sigconf,hyphens]{acmart}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage[normalem]{ulem}
+\usepackage{fancyhdr,graphicx,amsmath,amssymb, mathtools, scrextend, enumitem}
+\usepackage{xspace}
+%\usepackage[ruled,vlined]{algorithm2e} 
+\usepackage{parskip}
+\usepackage{url}
+\usepackage{import}
+\usepackage{epsfig}     % postscript figures
+\usepackage{graphicx}
+\usepackage{amsmath}
+\let\proof\relax
+\let\endproof\relax
+\usepackage{color}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage[compatible]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{comment}
+\usepackage{cite}
+
+%\usepackage[explicit]{titlesec}
+%\usepackage{titletoc}
+%\usepackage{lipsum}
+
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=1pt] (char) {#1};}}
+\newcommand{\ratio}[2]{#1\,:\,#2}
+\newcommand{\cut}[1]{}
+
+% To make the personalized notes go away, comment out these lines...
+\newcommand{\mike}[1]{\textbf{\color{red}MS: #1}}
+\newcommand{\sujata}[1]{\textbf{\color{red}SB: #1}}
+\newcommand{\aditya}[1]{\textbf{\color{red}AA: #1}}
+\newcommand{\ls}[1]{\textbf{\color{red}LS: #1}}
+\newcommand{\yanfang}[1]{\textbf{\color{blue}yf: #1}}
+
+%%% Latin abbrevs
+\newcommand{\etc}{\textit{etc.}\xspace}
+\newcommand{\ie}{\textit{i.e.,}\xspace}
+\newcommand{\eg}{\textit{e.g.,}\xspace}
+\newcommand{\etal}{\textit{et al.}\xspace}
+
+%%% Sections, figures etc. Please use these for uniformity
+\newcommand{\secref}[1]{\S\ref{#1}}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+\newcommand{\algoref}[1]{Algorithm~\ref{#1}}
+\newcommand{\eqnref}[1]{Equation~\ref{#1}}
+\newcommand{\lineref}[1]{Line~\ref{#1}}
+
+
+\newcommand{\system}{P4ML\xspace}
+\title{\system: In-network aggregation protocol}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\input{intro}
+\bibliographystyle{plain}
+%\bibliography{sample-bibliography}
+\bibliography{refer}
+\end{document}

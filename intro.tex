@@ -1,0 +1,43 @@
+\section{Introduction}
+Recent success of the in-network computation has attracted more 
+applications to be arrised. For example, 
+
+
+They consider the whole network only running one job
+as they did not support running their applications along with normal applications, 
+which does not involve the in-network computation.
+The inefficiency is due to the lack of congestion control, the same semantic 
+as in the traditional networking stack.
+Congestion control enables multiple applications co-locate in the same network and share the network
+bandwidth fairly or according to pre-configured policy.
+Thus, they totally isolate their traffic to the normal traffic, and thus, waste
+a large amount of the network resources. 
+
+In addition, they are not able to run the in-network applications simutaneously without stopping the running applications.
+Their resources are previsioned before the applications starts, i.e., 
+the memory location in switch that each packet should access, and the
+size of the memory size are fixed during the running time.
+They do not have a mechanism to dynamically adjust resource utilization 
+when another new in-network application enters into the network.
+
+
+The state-of-the-art in-network applications use timeout to detect packet loss for the implementation ease.  
+Packets loss recovery is a core component in
+traditional TCP networking stack.
+In TCP, each packet is marked by a monotonically increasing sequence number. 
+If the receiver receives out-of-order packets, it sends an ACK packet with the lowest 
+expected packet sequence number to the sender. 
+When the sender receives three duplicated ACKs, it assumes a packet loss happens.
+While a packet may be consumed at switch, it can cause the confusion at the receiver
+that a packet loss happened. It is challenging to design loss recovery due to that the end-to-end semantics are broken 
+for these new applications.
+ 
+Finally, these in-network applications assume that the switch always has the resources to do the aggregation,
+which is not true as more in-network applications enters into the network. Thus, it requires the applications or
+the underlying protocol to be able to handle the best efforts case, where the network may or may not do the 
+aggregation for the application. This relaxed the restriction that the in-network applications has to be deployed 
+in a programmable switch or a switch has the in-network aggregation program loaded.   
+
+This motivates us to design a protocol needs to meet the following requirements such that it can co-located with other 
+applications, whether they are in-network applications or not:
+(1)enable loss recovery; (2)
