@@ -80,3 +80,20 @@ This motivates us to design a new architecture, called \system, to meet the foll
 (3) support large scale deployment; (4) be easily extended to a general framework that can used in other applications~\TODO{need more thinking.}. 
 
 \system obeys the end-to-end principle and uses the end hosts as workers and parameter servers. 
+The end-to-end principle enables us to implement the congestion control and packet loss recovery 
+naturally at the end host. A straightforward approach could totally employ 
+the congestion control and packet loss recovery from traditional TCP stack.
+In TCP, each packet is marked by a monotonically increasing sequence number. 
+If the receiver receives out-of-order packets, it sends an ACK packet with the lowest 
+expected packet sequence number to the sender. 
+When the sender receives three duplicated ACKs, it assumes a packet loss happens.
+While a packet may be consumed at switch, it can cause the confusion at the receiver
+that a packet loss happened. It is challenging to design loss recovery due to that the end-to-end semantics are broken even we still use the hosts as the end points as the traditional machine learning systems. 
+ 
+Secondly, as the in-network aggregation requires maintaining the state in the switch, 
+we need \TODO{need to be specific.}
+
+Thirdly, the management complexity on the switch to deploy 
+the in-network aggregation system on the whole data centers 
+are still requires to be addressed.
+\TODO{need more specific.}      
