@@ -18,7 +18,12 @@
 %%\usepackage{caption}
 %%\usepackage{multirow}
 %%\usepackage[compatible]{algpseudocode}
-%%\usepackage{algorithm}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+%%\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{algorithmic}
+%\usepackage[noend]{algpseudocode}
+\renewcommand{\algorithmiccomment}[1]{\bgroup\hfill \textbf{\color{red}$\rightarrow$ ~#1}\egroup}
+
 %%\usepackage{comment}
 %%\usepackage{cite}
 
@@ -64,7 +69,8 @@
 
 \begin{document}
 \maketitle
-\input{intro}
+%\input{intro}
+\input{design}
 %%\bibliographystyle{plain}
 %\bibliography{sample-bibliography}
 %%\bibliography{refer}
