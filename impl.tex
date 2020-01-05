@@ -1,0 +1,35 @@
+\section{Implementation}
+We implemented the \system as a plugin of the BytePs, 
+which integrated the PyTorch, TensorFlow, and MxNet.
+Based on BytePs, \system intercepts the {\it Push } and {\it Pull} function calls at the workers
+and workers communicate with a \system parameter server.
+The end host component is written by RAW ETHERNET~\cite{}, 
+a Mellanox userspace networking programming model.
+
+\system leverages the hardware acceleration features, i.e., TSO and Multi-Packet QP.
+TSO feature can speed up the packet sending rate 
+by offloading packetization to the NIC and full utilize the PCIe bandwidth by DMA large chunk of data.
+To enhance the packet receiving rate, Multi-Packet QP feature can reduce the NIC memory footprint of at least $512$x smaller receive queue entries. Both features reduce CPU
+cost from fewer calls of packet sending and receiving, and fewer PCIe DMA reads for
+the NIC to fetch send queue and receive queue entries.
+ 
+ 
+Switch implementation is challenging due to the two main limitations: 
+(1) the switch only has 12 stages and each stage can maximumly process $4$ register value; 
+(2) the same register can be only 
+accessed once for a packet.
+To overcome the stage limitation, we first decide to use $8$ stages
+to guarantee to process $128$ bytes data for each packet such that 
+our performance can match with \switchml.  
+All the control information processing has to be compressed into the remaining $4$ stages. 
+The main control information for each aggregator to check follows the following sequence:
+(1) isACK; (2)application id; (3)packet sequence number; (4)isResend; (5)bitmap.
+As we demonstrated in the seciton~\ref{design}, a packet can do aggregation 
+on an aggregator only if the application id and the packet sequence number of 
+the packet match with those of the application.
+It indicates we can break the dependency from the packet sequence number to the application id.
+Thus, we merge the check of application id and packet sequence number in
+the same stage such that all the control information processing can be fit into $4$ stages.
+To avoid the same register accessed twice in the pipeline, 
+\system cleans the control information that is maintained by the register 
+in the ack backward path. 
