@@ -1,4 +1,51 @@
 \section{Introduction}
+Distributed Machine Learning (DML) system has become a recent trend to handle applications and datasets in a larger and larger scale\wenfei{cite}. As the end-host computation resources (GPU, CPU, memory) are fully utilized, the network becomes a new bottleneck. Thus, a few solutions propose to offload a part of the DML computation (typically the gradient aggregation) to the network devices\wenfei{cite switchML}. Such \emph{in-network computation} solutions essentially use high-speed network devices (e.g., 3.2Tbps switch backplane speed v.s. 100+Gbps end-host PCIE 3.0) to accelerate the gradient aggregation among multiple workers, avoiding the communication and computation bottleneck at the parameter servers.
+
+%benefit the model training with correctness guarantee, training speed acceleration, and machine learning (ML) application compatibility.\wenfei{cite hotnets, switchML}
+
+%benefit the DML model training in two ways. The network devices use special hardware to perform limited computation primitives (i.e., summation in DML) so as to accelerate computation speed (e.g., 1X Tbps in switch backplane v.s. 100+ Gbps in end host PCIE 3.0); the device processes data in high-speed serial, avoiding the overhead of concurrency control in the end host.
+
+However, several practicality issues must be resolved to persuade network operators to deploy such solutions. In this paper, we consider networks with multi-tenancy, i.e., a network with multiple ML applications and other applications. Deploying in-network computation solutions should satisfy three further requirements. First, the switch management should not be complicated. Second, the in-network computation had better not constrain the deployment (e.g., location) of ML applications. And third, network resources (both the bandwidth and the in-network computation resource) should be efficiently shared among all applications' instances (both ML and non-ML).
+
+%While in-network computation solutions show a great potential to accelerate the DML training speed, deploying such solutions in a network must have several practicality issues into consideration. In a network with \emph{multi-tenancy} (i.e., multiple users and applications, e.g., a private cloud), an in-network computation framework has the following requirements. First, it should not complicate the switch management, saving out the network operator's effort to (re)configure switches. Second, it should be friendly to existing network traffic, without hurting network bandwidth efficiency. 
+
+We propose a DML acceleration framework named \sysname for such multi-tenant networks. The target DML architecture of \sysname is the worker-PS architecture. \footnote{Multiple workers conduct synchronized data-parallel training: data is partitioned and distributed to multiple workers, and the training takes several round; in one round, each worker locally compute a gradient, all gradients are sent to the parameter server (PS), and the PS aggregates the gradient, update the parameter, and send the parameter back to each worker.} \sysname co-designs the programmable network switches and the end-host network stack. In the network, programmable switches are configured with \emph{aggregators}, which provides \emph{best-effort} aggregation services. For one ML application, when its multiple workers' tensor traffic traverses the same switch, elements at the same position of each tensor would be assigned to the same aggregator; the first few elements are cached and accumulated and the last one triggers the accumulated value to be sent to the next hop toward the PS. The aggregation service is optional and best effort without distorting existing switch configurations.
+
+The end-host network stack (between the NIC and the ML application) is customized to leverage the in-network aggregation service. The \sysname network stack provides the same push (gradient) and pull (parameters) interfaces as existing ML framework (e.g., PyTorch, BytePS), but the push is a many-to-one gradient aggregation and the pull is a one-to-many parameter broadcast (instead of the many one-to-one communication sessions between workers and the PS). To complement the possible incomplete computation in switches (as they are best-effort), \sysname network stack provides correctness guarantee. \sysname has a loss-recovery mechanism --- a sliding window is maintained for gradient packets, and PS'es parameter packets act as ACK for the gradient packets, and three duplicated ACK or timeout would trigger gradient packet retransmission. 
+
+
+In the design of \sysname, we overcome the following challenges. First, there is contradiction between the simplification of switch configurations and the flexibility of ML application deployment. All the paths from the workers to the PS would form a tree in the network topology, named aggregation tree. While with different worker-PS deployment, a program switch would be at different positions of the aggregation tree (hierarchy and sibling index) and aggregate different portion of workers. In a typical multi-tenancy network, switch management is decoupled from the application deployment, thus, it is challenging to keep the programmable switch both act logically correctly and application deployment agnostic. We propose to let the application (\sysname network stack) know the topology and the programmable switch position, so each worker can include its position in the aggregation tree in the packet header, and the switch aggregators could act correctly according to the position information without being reconfigured for each ML application instance deployment (aggregate workers' gradient of its local branch, avoid waiting for workers on other branches).
+
+Second, it is challenging to enforce efficient resource sharing among multiple ML and non-ML applications. As many applications coexist in the network, \sysname should avoid abusing the network resources. Thus, congestion control is introduced to the \sysname network stack for gradient sending, once resource contention happens, \sysname would be conservative\footnote{Using congestion control in \sysname is to avoid abusing resources, not for fairness.}. However, there are many resources can be contended (e.g., bandwidth, switch aggregators, etc.), and the traffic pattern is many-to-one and one-to-many, a uniform and representative congestion signal should be chosen. We exclude RTT as the many-to-one communication pattern violate the end-to-end transmission semantics (no round trip for most packets), and packet loss as loss hurts the performance. We finally choose the ECN as the congestion signal. Because no matter what resource is contended for, the switch before the contention point would have its queue built up, and ECN would be a reasonable signal to indicate such a contention.
+
+
+\wenfei{write until here.}
+
+% implementation: RDMA, and NIC feature
+
+
+% in the switch
+
+% in the end host
+
+%The design has the following principles: \textbf{(training acceleration)} the network switches provide a \emph{best-effort} aggregation service to process ML traffic, which could reduce the traffic volume and offload a part of the aggregation computation; \textbf{(switch management)} the switch aggregation service is additional to applications, and switch is dumb without applications configuration information. \textbf{(Correctness)} the end-host network stack handles data transmission failure, \textbf{(ML application compatibility)} and wrap the transmission interfaces to the applications; \textbf{(network friendly)} \sysname also has congestion control to avoid \sysname application instances abusing the network bandwidth and hurting other applications' traffic.
+
+% challenge 1:
+In the design of \sysname, we overcome the following challenges. First, CC Design. Second, 
+% challenge 2:
+
+% implementation
+In the implementation, we use RDMA + other accelerations.
+
+
+
+\sysname keeps the following design principles. First, 
+
+Challenges: (1) new CC for many-to-one; (2) scale to large topologies.
+
+
+\wenfei{write until here.}
+
 Recent success of the in-network computation has attracted more 
 applications to be arised.  
 \TODO{talk about the machine learning system.}
@@ -107,3 +154,4 @@ performance in the data center scale compared with traditional machine learning 
 Finally, it can be deployed both in the cluster with and without 
 programmable switches and is capable to run with other \system traffic and normal traffic. 
 \TODO{some experiments results.}
+
