@@ -1,1 +1,27 @@
 \section{Evaluation}
+\subsection{Setup}
+\yanfang{What hardware}
+\yanfang{what are we compare against? BytePS + TCP, BytePS + RDMA, SwitchML.}
+
+
+\subsection{Effect of Aggregator Number}
+\subsubsection{pick vgg16, resnet50, 8 workers -> 1 ps, varying the number of aggregators.}
+
+
+\subsection{\system performance}
+\subsubsection{pick 8 workers, varying the models.}
+\subsubsection{Varying the number of workers, pick vgg16, resnet50 }
+
+
+\subsection{Packet Loss Recovery Overhead}
+\subsubsection{pick 8 workers, pick vgg16, resnet50, varying loss rate  }
+\subsubsection{Varying the number of workers, pick vgg16, resnet50, fix the loss rate as 1\% }
+
+\subsection{Resource sharing between jobs}
+\subsubsection{jobs: 2 workers->1 host, 2 workers -> 1 host, show the images/s as time evolves, compare with SwitchML, with one job running with switch support, the other job running with end host.}
+\subsubsection{jobs: 4 workers->1 host, 2 workers -> 1 host, show the images/s as time evolves,compare with SwitchML, with one job running with switch support, the other job running with end host. }
+
+
+\subsection{Co-locate with normal traffic}
+%%\subsubsection{run vgg16, 2, 4, 6 workers, with 1 bg traffic, show the throughput of bg, show the image/s. we can compare with RDMA, SwitchML.}
+\subsubsection{run benchmark 2, 4, 6 workers, with 1 bg traffic, show the throughput of bg, the worker throughput of p4ml, the sum of the throughput for the bottleneck link as time evolves, we can compare with RDMA, SwitchML.}

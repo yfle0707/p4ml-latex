@@ -53,12 +53,45 @@ adopt the PS architecture.
 \end{tabular}
 \end{table}
 
-\subsection{In-network Computation}
+\subsection{In-network Computation for PS}
 % advantage of in-network computation solutions
+Deploying the PS architecture in the multi-tenant networks must solve the scalability issue, because 
+traffic from all workers would be sent together to the PS which could easily become a bottleneck. 
+In-network computation is an potential approach to solve/alliviate the scalability issue. It essential
+a few network devices (i.e., programmable switches) which can perform high-speed but limited 
+computation primitives on the network traffic. As the traffic traverse through the device, computation
+is performed and results is carried by the traffic to end hosts. End hosts benefit from in-network 
+computation by two means --- the computation is offloaded to high-speed serial processing in the 
+hardware so that CPU cycles are saved and concurrency control is eliminated, and the aggregation 
+computation reduces total traffic volume dramatically so that the receiver bottleneck in the 
+many-to-one communication pattern can be avoided. Prototypes such as SwitchML\wenfei{cite} has 
+shown the acceleration of applying in-network computation in ML, storage, and communication systems \wenfei{cite}.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.8\columnwidth]{figures/strawman.jpg}
+\caption{Strawman Solutions}
+\end{figure}
+
+Figure \wenfei{ref} shows two strawman solutions. In Figure Xa, the switch works as the PS --- aggregating gradients from multiple workers, and give the aggregation results back to workers; in Figure Xb, the switch performs on-path computation --- it aggregates multiple gradients and sends the result to the PS, the PS updates the parameters and reply to workers, and the switch broadcast the new parameters to the workers.
+
+Compared with the traditional PS architecture, the bottleneck is avoided: there is no many-to-one communication pattern, avoiding overloading a specific server or network link. Compared with Ring Reduce, total network capacity (especially the number of links) and server CPU cycles 
+(performing aggregation on servers) is saved.
+
+
 % v.s. traditional PS
 % v.s. all reduce
 \subsection{Requrements for Multi-tenancy}
 % requirements
+Deploying an in-network computation should satisfy three basic requirements: \textbf{(R1) correctness} the computation logic should be correct without influencing the correctness of the ML application,  \textbf{(R2) performance gain} the in-network should accelerate the computation efficiency (i.e., the traing speed), and \textbf{(R3) scability} the system's total processing capability should linearly increase with the number of workers. In addition, due to the nature of resource sharing in a multi-tenant network, deploying an in-network computation solution should also satisfy the following requirements.
+
+\textbf{(R4) switch management simplicity.} In practice, the network operators build the infrastructure first, and the application developer/admin deploys the application atop the network. Thus, assuming the network should be (re)configured for applications is not practical, and any applications (including the ML application) should not complicate the switch management.
+
+\textbf{(R5) topology freedom.} Similarly, a network topology could vary from network to network. A in-network computation solution should be deployed and work without assuming the network topology.
+
+\textbf{(R6) ML application friendly.} While the in-network computation accelerate the communication of an ML framework, the new solution should not assume too much modification to the existing ML framework, i.e., the interfaces between the communication and computation should be kept unchanged with existing frameworks.
+
+
 
 
 
