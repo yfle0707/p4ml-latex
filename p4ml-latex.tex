@@ -41,6 +41,7 @@
 % To make the personalized notes go away, comment out these lines...
 \newcommand{\aditya}[1]{\textbf{\color{blue}AA: #1}}
 \newcommand{\yanfang}[1]{\textbf{\color{red}yf: #1 \\}}
+\newcommand{\wenfei}[1]{\textbf{\color{orange}WW: #1}}
 
 \newcommand{\TODO}[1]{\textbf{\color{red}TODO: #1 \\}}
 %%% Latin abbrevs
@@ -59,6 +60,7 @@
 
 
 \newcommand{\system}{P4ML\xspace}
+\newcommand{\sysname}{P4ML\xspace}
 \newcommand{\switchml}{SwitchML\xspace}
 \title{\system: In-network aggregation protocol}
 \author{}
@@ -66,9 +68,12 @@
 
 \begin{document}
 \maketitle
-%\input{intro}
+\input{intro}
+\input{background}
 \input{design}
 \input{impl}
+\input{evaluation}
+\input{conclusion}
 %%\bibliographystyle{plain}
 %\bibliography{sample-bibliography}
 %%\bibliography{refer}

@@ -1,0 +1,26 @@
+\section{Background}
+\subsection{Data Parallel Training and PS Architecture}
+% data parallel distributed training
+A ML model (e.g., neural networks, regression, support vector machine) 
+consists of many parameters, and the ML training phase aims to explore the 
+parameters that fit the model to the dataset. ML frameworks usually use 
+grediant descending to explore such parameters.
+In distributed ML training, many workers coordinate to compute the model parameters. 
+One common practice is to partition the training dataset to multiple workers,
+and have all workers take iterations to train the model.
+In each iteration, each worker use a batch of data points (e.g., pictures in ImageNet)
+to compute a grediant, all workers aggregate their local grediants and update the parameters.
+There are two approaches to perform the grediant aggregation and parameter update.
+
+\textbf{Parameter servers} (PS) 
+
+% two approaches
+
+
+% communication bound
+\subsection{In-network Computation}
+% advantage of in-network computation solutions
+% v.s. traditional PS
+% v.s. all reduce
+\subsection{Multi-tenancy Runtime Environment}
+% requirements
