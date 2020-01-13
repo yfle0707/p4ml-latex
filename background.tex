@@ -1,5 +1,5 @@
 \section{Background}
-\subsection{Data Parallel Training and PS Architecture}
+\subsection{Distributed Training}
 % data parallel distributed training
 A ML model (e.g., neural networks, regression, support vector machine) 
 consists of many parameters, and the ML training phase aims to explore the 
@@ -10,17 +10,68 @@ One common practice is to partition the training dataset to multiple workers,
 and have all workers take iterations to train the model.
 In each iteration, each worker use a batch of data points (e.g., pictures in ImageNet)
 to compute a grediant, all workers aggregate their local grediants and update the parameters.
-There are two approaches to perform the grediant aggregation and parameter update.
+In existing typical ML frameworks (e.g., TensorFlow, PyTorch\wenfei{cite}),
+there are two approaches to perform the grediant aggregation and parameter update.
 
-\textbf{Parameter servers} (PS) 
+\textbf{(1) Parameter servers} (PS) can be deployed in the framework to aggregate the grediants 
+in particular. A PS maintains a copy of parameters, receives grediants from all workers, and 
+accumulates the grediants to the parameters (with a learning rate). If there are multiple PS'es,
+each one would undertake a part of the parameters and the corresponding part of the grediant.
+\textbf{(2) All Reduce} approach has workers to coordinate in a peer-to-peer way: each worker 
+aggregates a part of the grediant from a few neighbors and relies the partial results to its next neighbor;
+by scheduling the communication pattern (e.g., ring, binary tree), the complete result
+is aggregated at one (or several workers), and broadcasted or streamed to all workers.
+
+
 
 % two approaches
 
+\textbf{Choice of Aggregation Approach in \sysname.} The all-reduce architecture is more suitable for 
+an \emph{dedicated} infrastructure (including servers and the network) for ML applications ---
+all workers coordinate in a synchronized fashion (assuming no stragglers), the
+network is dedicated for ML traffic, and the transmission protocol is scalable to the 
+number of workers. The PS architecture workers better in a \emph{sharing} environments 
+(i.e., many applications dynamically share the infrastructure) --- 
+as there is a single copy of parameters at the PS, parameters are easier to be consistent
+among all workers, so that stragglers and dynamic joining/leaving of workers can be tolerated
+without affecting a whole ML job efficiency. In this paper, we target the multi-tenant networks
+where the resources are hard to be dedicated for ML applications, so our solution would 
+adopt the PS architecture.
+ 
 
-% communication bound
+\begin{table}[htb]
+\caption{Compare PS and All-Reduce}
+\wenfei{a tentative table}
+
+\begin{tabular}{|c|c|c|}
+\hline
+\multicolumn{1}{|r|}{}         & \multicolumn{1}{r|}{\textbf{PS}} & \multicolumn{1}{r|}{\textbf{all-reduce}} \\ \hline
+\textbf{asynchronzied}         & yes                              & no                                       \\ \hline
+\textbf{scalability}           & no                               & yes                                      \\ \hline
+\textbf{data consistency}      & yes                              & no                                       \\ \hline
+\textbf{scheduling complexity} & low                              & high                                     \\ \hline
+\end{tabular}
+\end{table}
+
 \subsection{In-network Computation}
 % advantage of in-network computation solutions
 % v.s. traditional PS
 % v.s. all reduce
-\subsection{Multi-tenancy Runtime Environment}
+\subsection{Requrements for Multi-tenancy}
 % requirements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
