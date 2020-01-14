@@ -1,5 +1,9 @@
 \section{Design}
 \subsection{Overview}
+We design a framework named \sysname which integrates in-network computation with the DML framework. A \sysname application job trains a model with several workers and one PS. After training one batch of data points,  each worker generates a local gradient, and all workers and the PS has two phases to update parameters. In the first phase, each gradient traverse a path to the PS, and all paths form a tree structure in the network topology; in the second phase, the PS accumulate all gradients to the parameters locally at the PS (with a learning rate), and broadcast the updated parameters to each workers.
+
+\sysname deploys aggregation service on the programmable network switches, whenever the two or more bytestreams of the gradients from the same ML application instance meet in the switch, they are aggregated; in this way, network traffic volumes is reduced and PS aggregation computation is offloaded, and the ML application get performance gain (R2). The aggregation service on each switch has a maximum fan-in degree (many-to-one), but all involved switches on the aggregation tree are organized in a tree structure, supporting the system to scale up (R3). To simplify the 
+
 
 \wenfei{write until here}
 

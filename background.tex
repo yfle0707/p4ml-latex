@@ -7,7 +7,8 @@ parameters that fit the model to the dataset. ML frameworks usually use
 gradient descending to explore such parameters.
 In distributed ML training, many workers coordinate to compute the model parameters. 
 One common practice is to partition the training dataset to multiple workers,
-and have all workers take iterations to train the model.
+and have all workers take iterations to train the model.\footnote{One epoch has several iterations,
+one iteration has several batches, and one batch trains several data points.}
 In each iteration, each worker use a batch of data points (e.g., pictures in ImageNet)
 to compute a gradient, all workers aggregate their local gradients and update the parameters.
 In existing typical ML frameworks (e.g., TensorFlow, PyTorch\wenfei{cite}),
