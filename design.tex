@@ -12,26 +12,17 @@ On the workers, \sysname reconstructs the network stack for the in-network servi
 
 
 
+\textbf{(C2) Enforcing efficient switch resource sharing.} Programmable switches has limited computation resources (i.e., computation unit, pipeline stages, and memory), thus, the number of available aggregators is limited on each switch. It is challenging to make multiple \sysname application instances to share these aggregators. Each instance's sharing quota should be dynamically allocated/deallocated when its traffic starts/ends, because it is not practical (re)configure the switch for each application instance. 
 
-\wenfei{write until here}
-
-\textbf{(C2) Enforcing efficient switch resource sharing.} In existing networked applications, when different instances compete for network bandwidth, congestion control is usually used to let each part backoff and converge to a global stable state, where network bandwidth is efficiently utilized with high saturation. In \sysname, there is one more kind of resource for \sysname instances to compete for --- the aggregators on programmable switches. 
-
+\textbf{Solution:} In a switch, all aggregators are maintained as a pool; each gradient packet would be mapped (hashed) to one specific aggregator by its ID <application\_instance\_ID, packet\_sequence\_number>. Each aggregator applies a First-Come-First-Service (FCFS) rule --- when contention happends (i.e., same aggregator but different instance ID), the aggregator only serves the first instance and letting later instance's traffic get through without aggregation. Thus, any \sysname instance can start and get the best-effort service on switches.
 
 
-In a multi-tenancy network, several ML applications and non-ML applications coexist, all application instances may contend for various network resources --- the instances of both ML and non-ML applications may contend for network bandwidth, ML application instances may contend for aggregator on switches. A machanism is needed to avoid network resources is efficiently used (i.e., not wasted and not abused). It is challenging to design one uniform mechanism solve various possible contentions.
+\textbf{(C3) Achieving high switch resource utilization.} The aggregators should be highly saturated by \sysname application instances. And this computation should be effective (i.e., not being abused): once traffic is aggregated, it had better not be dropped in later links.
 
-\textbf{Solution:} We analyze three possible reasons of contention --- link bandwidth, switch aggregators, and receiver 
-
-
+\textbf{Solution:} \sysname introduces congestion control in workers and PS. The worker maintains a sliding window for packets of its gradient, and the updated parameter packets work as the ACK, which controls the window size. The window size is adjusted following Additive-Increase-Multiplicative-Decrease (AIMD) scheme. Thus, when there is no contention, the gradient aggregation traffic would gradually saturate each on-path switch's aggregators; when contention happens (contending whether on aggregators or other resources such as links or receivers), worker would reduce the sending rate. All contending parties would do backoff and converge to a global stable state, avoiding abusing any resources (including the aggregators).
 
 
-
-\textbf{(R7) Efficient Resource Sharing.} Network resources such as bandwidth and switch memory (for in-network computation) are shared among multiple ML and non-ML applications. Once contention happens, all contending applications should coverge to a stable state where network resources are efficiently used without being abused or wasted.
-
-
-\textbf{(R5) topology freedom.} Similarly, a network topology could vary from network to network. An in-network computation solution should be deployed and work without assuming the network topology.
-
+\wenfei{write until here, detail each section now.}
 
 Recent success of the in-network computation has attracted more 
 applications to be arised.  
