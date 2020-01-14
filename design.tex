@@ -1,11 +1,37 @@
 \section{Design}
 \subsection{Overview}
-We design a framework named \sysname which integrates in-network computation with the DML framework. A \sysname application job trains a model with several workers and one PS. After training one batch of data points,  each worker generates a local gradient, and all workers and the PS has two phases to update parameters. In the first phase, each gradient traverse a path to the PS, and all paths form a tree structure in the network topology; in the second phase, the PS accumulate all gradients to the parameters locally at the PS (with a learning rate), and broadcast the updated parameters to each workers.
+We design a framework named \sysname which integrates in-network computation with the DML framework. A \sysname application job trains a model with several workers and one PS. After training one batch of data points,  each worker generates a local gradient, and all workers and the PS has two phases to update parameters. In the first phase, each gradient traverse a path to the PS, and all paths form a tree structure in the network topology; in the second phase, the PS accumulates all gradients to the parameters locally at the PS (with a learning rate), and broadcasts the updated parameters to each worker.
 
-\sysname deploys aggregation service on the programmable network switches, whenever the two or more bytestreams of the gradients from the same ML application instance meet in the switch, they are aggregated; in this way, network traffic volumes is reduced and PS aggregation computation is offloaded, and the ML application get performance gain (R2). The aggregation service on each switch has a maximum fan-in degree (many-to-one), but all involved switches on the aggregation tree are organized in a tree structure, supporting the system to scale up (R3). To simplify the 
+\sysname deploys an aggregation service on the programmable network switches (undertaken by a few strcuctures named aggregators). In phase 1, whenever the two or more bytestreams of the gradients from the same ML application instance meet in the switch, they are aggregated; in this way, network traffic volumes is reduced and PS aggregation computation is offloaded, and the ML application get performance gain (\textbf{R2}). The aggregation service on each switch has a maximum fan-in degree (many-to-one), but all involved switches on the aggregation tree are organized in a hierarchical structure, supporting the system to scale up (\textbf{R3}). To simplify the switch configure (\textbf{R4}), the aggregation service is isolated from other configurations (routing, firewall, etc.) on the switch, once \sysname traffic is recognized by a classifier, they would traverse the aggregation service. And the aggregation service is \emph{best-effort} --- if an aggregator cannot get complete aggregation result due to some worker's failure (e.g., packet loss, machine failure), it would send partial results. In phase 2, the switch employs a broadcast mechanism to duplicate one copy of updated parameters to many workers.
+
+On the workers, \sysname reconstructs the network stack for the in-network service. \sysname wraps up the same tensor sending/receiving interfaces as existing frameworks (e.g., BytePS, PyTorch) so that it is compatible with existing frameworks (\textbf{R5}). As the swtiches only provide a best-effort service, the workers and the PS (\sysname network stack) coordinate to guarantee the logical correctness (\textbf{R1}). In Phase 1, when a worker sends a packet stream of its gradient, each packet also encodes the aggregation information; the switches does not guarantee a complete aggregation result: if packets are not lost but not aggregated, the PS would continue the aggregation (based on the aggregation information in packets) and compute the complete result, if packets are lost, the PS would send acknowledged parameter packets to trigger retransmission on the workers. In the design and implementation, we overcome the following to challenges.
+
+\textbf{(C1) Supporting flexible aggregation structure.} In a multi-tenancy network, we assume the applications can be deployed flexibly in the network, thus the gradient aggregation tree can be of arbitrary structure from multiple workers to one PS. While the network topology is fixed, in different trees, one specific program switch may be at different positions and hierarchies, and in charge of aggregating gradients from different potions of workers. It is challenging to make an application-agnositic switch work correctly for all possible application deployments.
+
+\textbf{Solution:} \sysname uses the deployment plan (i.e., worker and PS location) and the network topolgoy (including programmable switches) to pre-compute the aggregation tree, and then it pre-computes the aggregation services for each worker's gradient and encodes this information (aggregation hierarchy) into the gradient packet header. Each on-path programmable switch would behave according to its own aggregation hierarchy: dropping duplicated packets, sending completely aggregated result, and handling retransmitted packets.
+
+
 
 
 \wenfei{write until here}
+
+\textbf{(C2) Enforcing efficient switch resource sharing.} In existing networked applications, when different instances compete for network bandwidth, congestion control is usually used to let each part backoff and converge to a global stable state, where network bandwidth is efficiently utilized with high saturation. In \sysname, there is one more kind of resource for \sysname instances to compete for --- the aggregators on programmable switches. 
+
+
+
+In a multi-tenancy network, several ML applications and non-ML applications coexist, all application instances may contend for various network resources --- the instances of both ML and non-ML applications may contend for network bandwidth, ML application instances may contend for aggregator on switches. A machanism is needed to avoid network resources is efficiently used (i.e., not wasted and not abused). It is challenging to design one uniform mechanism solve various possible contentions.
+
+\textbf{Solution:} We analyze three possible reasons of contention --- link bandwidth, switch aggregators, and receiver 
+
+
+
+
+
+\textbf{(R7) Efficient Resource Sharing.} Network resources such as bandwidth and switch memory (for in-network computation) are shared among multiple ML and non-ML applications. Once contention happens, all contending applications should coverge to a stable state where network resources are efficiently used without being abused or wasted.
+
+
+\textbf{(R5) topology freedom.} Similarly, a network topology could vary from network to network. An in-network computation solution should be deployed and work without assuming the network topology.
+
 
 Recent success of the in-network computation has attracted more 
 applications to be arised.  

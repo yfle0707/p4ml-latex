@@ -87,13 +87,8 @@ Deploying an in-network computation should satisfy three basic requirements: \te
 
 \textbf{(R4) switch management simplicity.} In practice, the network operators build the infrastructure first, and the application developer/admin deploys the application atop the network. Thus, assuming the network should be (re)configured for applications is not practical, and any applications (including the ML application) should not complicate the switch management.
 
-\textbf{(R5) topology freedom.} Similarly, a network topology could vary from network to network. An in-network computation solution should be deployed and work without assuming the network topology.
 
-\textbf{(R6) ML application friendly.} While the in-network computation accelerates the communication of an ML framework, the new solution should not assume too much modification to the existing ML framework, i.e., the interfaces between the communication and computation should be kept unchanged with existing frameworks.
-
-\textbf{(R7) Efficient Resource Sharing.} Network resources such as bandwidth and switch memory (for in-network computation) are shared among multiple ML and non-ML applications. Once contention happens, all contending applications should coverge to a stable state where network resources are efficiently used without being abused or wasted.
-
-
+\textbf{(R5) ML application Compatibility.} While the in-network computation accelerates the communication of an ML framework, the new solution should not assume too much modification to the existing ML framework, i.e., the interfaces between the communication and computation should be kept unchanged with existing frameworks.
 
 
 
